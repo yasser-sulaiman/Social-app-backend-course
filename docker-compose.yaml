@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16.3
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: social
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_HOST_AUTH_METHOD: trust   # ← allow any host connection without password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  
+  redis:
+    image: redis:6.2-alpine
+    restart: unless-stopped
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+  
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    hostname: redis-commander
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      - REDIS_HOSTS=redis
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+volumes:
+  db-data:
