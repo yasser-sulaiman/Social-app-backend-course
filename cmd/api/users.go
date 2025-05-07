@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"net/http"
 	"social/internal/store"
 	"strconv"
@@ -101,34 +100,34 @@ func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (app *application) userContextMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := chi.URLParam(r, "userID")
-		id, err := strconv.ParseInt(userID, 10, 64)
-		if err != nil {
-			app.internalServerError(w, r, err)
-			return
-		}
+// func (app *application) userContextMiddleware(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		userID := chi.URLParam(r, "userID")
+// 		id, err := strconv.ParseInt(userID, 10, 64)
+// 		if err != nil {
+// 			app.internalServerError(w, r, err)
+// 			return
+// 		}
 
-		ctx := r.Context()
+// 		ctx := r.Context()
 
-		post, err := app.store.Users.GetByID(ctx, id)
-		if err != nil {
-			switch err {
-			case store.ErrNotFound:
-				app.notFoundResponse(w, r, err)
-			default:
-				app.internalServerError(w, r, err)
-			}
-			return
-		}
+// 		post, err := app.store.Users.GetByID(ctx, id)
+// 		if err != nil {
+// 			switch err {
+// 			case store.ErrNotFound:
+// 				app.notFoundResponse(w, r, err)
+// 			default:
+// 				app.internalServerError(w, r, err)
+// 			}
+// 			return
+// 		}
 
-		// Store the post in the context
-		ctx = context.WithValue(ctx, userCtx, post)
+// 		// Store the post in the context
+// 		ctx = context.WithValue(ctx, userCtx, post)
 
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
+// 		next.ServeHTTP(w, r.WithContext(ctx))
+// 	})
+// }
 
 func getUserFromCtx(r *http.Request) *store.User {
 	user, _ := r.Context().Value(userCtx).(*store.User)
